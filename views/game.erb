@@ -15,3 +15,18 @@ Player's cards:
     <li><%= card.to_s %></li>
   <% end %>
 </ul>
+
+<p>
+What would you like to do?
+<%= session[:player_name] %> has <%= calculate_total(session[:player_cards]) %>
+
+<% if @show_hit_or_stay_buttons %>
+<form action="/game/player/hit" method='post'>
+  <input type='submit' class='btn' value='Hit'>
+</form>
+<form action="/game/player/stay" method='post'>
+  <input type='submit' class='btn' value='Stay'>
+</form>
+<% end %>
+
+</p>
