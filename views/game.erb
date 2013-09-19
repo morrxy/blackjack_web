@@ -1,18 +1,28 @@
-<h1>Blackjack!</h1>
+<h1 id="title">Blackjack!</h1>
 
-Welcome <%= session[:player_name] %>.
+<div class="well">
+<h4>Dealer's cards:</h4>
 
-<div>
+<ul class="cards">
+  <li style="display:inline-block">
+    <% if @in_player_turn %>
+      <img src="/images/cards/cover.jpg">
+    <% else %>
+      <img src="/images/cards/<%= card_to_image(session[:dealer_cards][0]) %>">
+    <% end %>
+  </li>
 
-Dealer's cards:
-
-<ul>
-  <% session[:dealer_cards].each do |card| %>
-    <li><%= card.to_s %></li>
+  <% last_index = session[:dealer_cards].size - 1 %>
+  <% session[:dealer_cards].slice(1..last_index).each do |card| %>
+    <li style="display:inline-block">
+      <img src="/images/cards/<%= card_to_image(card) %>">
+    </li>
   <% end %>
 </ul>
 
+<% if !@in_player_turn %>
 dealer has <%= calculate_total(session[:dealer_cards]) %>.
+<% end %>
 
 <% if @dealer_will_hit %>
 dealer will hit.
@@ -25,26 +35,28 @@ dealer will hit.
 
 <br>
 
-<div>
-
-Player's cards:
-
-<ul>
+<div class='well'>
+<h4>Player's cards:</h4>
+<ul class="cards">
   <% session[:player_cards].each do |card| %>
-    <li><%= card.to_s %></li>
+    <li style="display:inline-block">
+      <img src="/images/cards/<%= card_to_image(card) %>">
+    </li>
   <% end %>
 </ul>
 
-<%= session[:player_name] %> has <%= calculate_total(session[:player_cards]) %>
-
-<% if @show_hit_or_stay_buttons %>
-What would you like to do?
-<form action="/game/player/hit" method='post'>
-  <input type='submit' class='btn' value='Hit'>
-</form>
-<form action="/game/player/stay" method='post'>
-  <input type='submit' class='btn' value='Stay'>
-</form>
-<% end %>
+<h4>
+<%= session[:player_name] %> has <%= calculate_total(session[:player_cards]) %>.
+<% if @show_hit_or_stay_buttons %> What would you like to do?<% end %>
+</h4>
 
 </div>
+
+<% if @show_hit_or_stay_buttons %>
+<form action="/game/player/hit" method='post' id='hit'>
+  <input type='submit' class='btn btn-success btn-large' value='Hit'>
+</form>
+<form action="/game/player/stay" method='post' id='stay'>
+  <input type='submit' class='btn btn-warning btn-large' value='Stay'>
+</form>
+<% end %>

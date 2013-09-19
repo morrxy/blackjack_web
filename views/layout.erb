@@ -18,14 +18,14 @@
     </div>
 
   <div class="container">
-    <% if @game_end %>
-      <div>play again? <a href="/game" class="btn btn-primary">Yes</a> <a href="/game_over" class='btn'>No</a> </div>
-    <% end %>
     <%if @error %>
       <div class="alert alert-error"><%=@error%></div>
     <% end %>
     <% if @success %>
       <div class='alert alert-success'><%= @success %></div>
+    <% end %>
+    <% if @game_end %>
+      <div>play again? <a href="/game" class="btn btn-primary">Yes</a> <a href="/game_over" class='btn'>No</a> </div>
     <% end %>
 
       <%= yield %>

@@ -1,0 +1,12 @@
+#hit,
+#stay {
+  float: left;
+}
+
+#hit {
+  margin-right: 10px;
+}
+
+.cards img {
+  margin: 0 5px 5px 0;
+}

@@ -26,12 +26,41 @@ helpers do
 
     total
   end
+
+  def card_to_image(card)
+    suit = suit_str(card[0])
+    face = face_str(card[1])
+    "#{ suit }_#{ face }.jpg"
+  end
+
+  def suit_str(s)
+    case s
+    when 'C' then 'clubs'
+    when 'D' then 'diamonds'
+    when 'H' then 'hearts'
+    when 'S' then 'spades'
+    end
+  end
+
+  def face_str(s)
+    if s.to_i == 0
+      case s
+      when 'A' then 'ace'
+      when 'J' then 'jack'
+      when 'Q' then 'queen'
+      when 'K' then 'king'
+      end
+    else
+      s
+    end
+  end
 end
 
 before do
   @show_hit_or_stay_buttons = true
   @dealer_will_hit = false
   @game_end = false
+  @in_player_turn = true
 end
 
 get '/' do
@@ -47,6 +76,7 @@ get '/new_player' do
 end
 
 post '/new_player' do
+  redirect '/new_player' if (/^[A-Za-z]+$/ =~ params[:player_name]) == nil
   session[:player_name] = params[:player_name]
   redirect '/game'
 end
@@ -69,6 +99,7 @@ get '/game' do
     @success = 'Congratulation, Blackjack! you win.'
     @show_hit_or_stay_buttons = false
     @game_end = true
+    @in_player_turn = false
   end
 
   erb :game
@@ -80,35 +111,24 @@ post '/game/player/hit' do
     @success = 'Congratulation, Blackjack! you win.'
     @show_hit_or_stay_buttons = false
     @game_end = true
+    @in_player_turn = false
   end
   if calculate_total(session[:player_cards]) > 21
     @error = "Sorry, it looks like you busted."
     @show_hit_or_stay_buttons = false
     @game_end = true
+    @in_player_turn = false
   end
 
   erb :game
 end
 
 post '/game/player/stay' do
-  # @success = 'You have chosen to stay.'
   @show_hit_or_stay_buttons = false
+  @in_player_turn = false
 
   player_total = calculate_total(session[:player_cards])
   dealer_total = calculate_total(session[:dealer_cards])
-
-  # if calculate_total(session[:dealer_cards]) > calculate_total(session[:player_cards])
-  #   @error = "dealer has #{ calculate_total(session[:dealer_cards]) }, dealer win"
-  #   @show_hit_or_stay_buttons = false
-  #   @game_end = true
-  # end
-
-  # if dealer_total > player_total
-  #   @error = "player stay at #{ player_total }, dealer stay at #{ dealer_total }, dealer win."
-  #   @show_hit_or_stay_buttons = false
-  #   @game_end = true
-  # end
-
 
   if dealer_total < 17
     @dealer_will_hit = true
@@ -140,6 +160,7 @@ end
 
 post '/game/dealer/hit' do
   @show_hit_or_stay_buttons = false
+  @in_player_turn = false
 
   session[:dealer_cards] << session[:deck].pop
   player_total = calculate_total(session[:player_cards])
