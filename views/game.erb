@@ -2,25 +2,43 @@
 
 Welcome <%= session[:player_name] %>.
 
+<div>
+
 Dealer's cards:
+
 <ul>
   <% session[:dealer_cards].each do |card| %>
     <li><%= card.to_s %></li>
   <% end %>
 </ul>
 
+dealer has <%= calculate_total(session[:dealer_cards]) %>.
+
+<% if @dealer_will_hit %>
+dealer will hit.
+<form id="dealer_hit" action="/game/dealer/hit" method="POST">
+  <input type="submit" value="Click to see dealder's next card →" class="btn btn-primary">
+</form>
+<% end %>
+
+</div>
+
+<br>
+
+<div>
+
 Player's cards:
+
 <ul>
   <% session[:player_cards].each do |card| %>
     <li><%= card.to_s %></li>
   <% end %>
 </ul>
 
-<p>
-What would you like to do?
 <%= session[:player_name] %> has <%= calculate_total(session[:player_cards]) %>
 
 <% if @show_hit_or_stay_buttons %>
+What would you like to do?
 <form action="/game/player/hit" method='post'>
   <input type='submit' class='btn' value='Hit'>
 </form>
@@ -29,4 +47,4 @@ What would you like to do?
 </form>
 <% end %>
 
-</p>
+</div>
