@@ -2,12 +2,16 @@
 
 <p><%= session[:player_name] %> has $<%= session[:total_money] %>.</p>
 
-<% if @no_money %>
+<% if session[:total_money] <= 0 %>
+
 <p>you have no money, <a href="/new_game" class='btn'>Start Over</a></p>
+
 <% else %>
+
 <form method='post' action='/bet'>
 <input type='text' name='bet_amount'>
 <br>
 <input type='submit' class='btn' value='Make Bet'>
 </form>
+
 <% end %>
