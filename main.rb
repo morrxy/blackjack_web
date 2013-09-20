@@ -65,10 +65,22 @@ end
 
 get '/' do
   if session[:player_name]
-    redirect '/game'
+    redirect '/bet'
   else
     redirect '/new_player'
   end
+end
+
+get '/bet' do
+  session[:total_money] = 500 if session[:total_money] == nil
+  erb :bet
+end
+
+post '/bet' do
+  bm = params[:bet_amount]
+  redirect '/bet' if (/^\d+$/ =~ bm) == nil || bm.to_i > session[:total_money] || bm.to_i < 1
+  session[:bet_amount] = bm.to_i
+  redirect '/game'
 end
 
 get '/new_player' do
@@ -76,9 +88,12 @@ get '/new_player' do
 end
 
 post '/new_player' do
-  redirect '/new_player' if (/^[A-Za-z]+$/ =~ params[:player_name]) == nil
+  if (/^[A-Za-z]+$/ =~ params[:player_name]) == nil
+    redirect '/new_player'
+  end
   session[:player_name] = params[:player_name]
-  redirect '/game'
+  # redirect '/game'
+  redirect '/bet'
 end
 
 get '/game' do
@@ -107,17 +122,21 @@ end
 
 post '/game/player/hit' do
   session[:player_cards] << session[:deck].pop
+
   if calculate_total(session[:player_cards]) == 21
-    @success = 'Congratulation, Blackjack! you win.'
+    session[:total_money] += session[:bet_amount]
+    @success = "Congratulation, Blackjack! you win. #{ session[:player_name] } now has $#{ session[:total_money]}."
     @show_hit_or_stay_buttons = false
-    @game_end = true
     @in_player_turn = false
+    @game_end = true
   end
+
   if calculate_total(session[:player_cards]) > 21
-    @error = "Sorry, it looks like you busted."
+    session[:total_money] -= session[:bet_amount]
+    @error = "Sorry, it looks like you busted. #{ session[:player_name] } now has $#{ session[:total_money]}."
     @show_hit_or_stay_buttons = false
-    @game_end = true
     @in_player_turn = false
+    @game_end = true
   end
 
   erb :game
@@ -134,13 +153,15 @@ post '/game/player/stay' do
     @dealer_will_hit = true
   else
     if player_total > dealer_total
-      @success = "player stay at #{ player_total }, dealer stay at #{ dealer_total }, player win."
+      session[:total_money] += session[:bet_amount]
+      @success = "player stay at #{ player_total }, dealer stay at #{ dealer_total }, player win. #{ session[:player_name] } now has $#{ session[:total_money]}."
       @game_end = true
     elsif player_total < dealer_total
-      @error = "player stay at #{ player_total }, dealer stay at #{ dealer_total }, dealer win."
+      session[:total_money] -= session[:bet_amount]
+      @error = "player stay at #{ player_total }, dealer stay at #{ dealer_total }, dealer win. #{ session[:player_name] } now has $#{ session[:total_money]}."
       @game_end = true
     else
-      @success = "player stay at #{ player_total }, dealer stay at #{ dealer_total }, it's a tie."
+      @success = "player stay at #{ player_total }, dealer stay at #{ dealer_total }, it's a tie. #{ session[:player_name] } now has $#{ session[:total_money]}."
       @game_end = true
     end
   end
@@ -151,6 +172,7 @@ end
 
 get '/new_game' do
   session[:player_name] = nil
+  session[:total_money] = nil
   redirect '/new_player'
 end
 
@@ -167,19 +189,26 @@ post '/game/dealer/hit' do
   dealer_total = calculate_total(session[:dealer_cards])
 
   if dealer_total > 21
-    @success = "player stay at #{ player_total }, dealer stay at #{ dealer_total }, player win."
+    session[:total_money] += session[:bet_amount]
+    @success = "player stay at #{ player_total }, dealer stay at #{ dealer_total }, player win. #{ session[:player_name] } now has $#{ session[:total_money]}."
+    @game_end = true
+  elsif dealer_total == 21
+    session[:total_money] -= session[:bet_amount]
+    @error = "player stay at #{ player_total }, dealer stay at #{ dealer_total }, dealer win. #{ session[:player_name] } now has $#{ session[:total_money] }."
     @game_end = true
   elsif dealer_total < 17
     @dealer_will_hit = true
   else
     if player_total > dealer_total
-      @success = "player stay at #{ player_total }, dealer stay at #{ dealer_total }, player win."
+      session[:total_money] += session[:bet_amount]
+      @success = "player stay at #{ player_total }, dealer stay at #{ dealer_total }, player win. #{ session[:player_name] } now has $#{ session[:total_money]}."
       @game_end = true
     elsif player_total < dealer_total
-      @error = "player stay at #{ player_total }, dealer stay at #{ dealer_total }, dealer win."
+      session[:total_money] -= session[:bet_amount]
+      @error = "player stay at #{ player_total }, dealer stay at #{ dealer_total }, dealer win. #{ session[:player_name] } now has $#{ session[:total_money]}."
       @game_end = true
     else
-      @success = "player stay at #{ player_total }, dealer stay at #{ dealer_total }, it's a tie."
+      @success = "player stay at #{ player_total }, dealer stay at #{ dealer_total }, it's a tie. #{ session[:player_name] } now has $#{ session[:total_money]}."
       @game_end = true
     end
   end

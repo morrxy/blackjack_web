@@ -47,6 +47,7 @@ dealer will hit.
 
 <h4>
 <%= session[:player_name] %> has <%= calculate_total(session[:player_cards]) %>.
+<small><%= session[:player_name] %> has <strong>$<%= session[:total_money] %></strong> total. Bet amount this round: <strong>$<%= session[:bet_amount] %></strong></small>
 <% if @show_hit_or_stay_buttons %> What would you like to do?<% end %>
 </h4>
 
