@@ -135,7 +135,10 @@ get '/new_player' do
 end
 
 post '/new_player' do
-  redirect '/new_player' if (/^[A-Za-z]+$/ =~ params[:player_name]).nil?
+  if (/^[A-Za-z]+$/ =~ params[:player_name]).nil?
+    @error = 'name can only contains English letter!'
+    halt erb(:new_player)
+  end
 
   session[:player_name] = params[:player_name]
   redirect '/bet'
