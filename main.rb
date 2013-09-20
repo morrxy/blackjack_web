@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'sinatra'
 require 'pry'
-# require 'sinatra/reloader'
+require 'sinatra/reloader'
 
 set :sessions, true
 
@@ -73,6 +73,9 @@ end
 
 get '/bet' do
   session[:total_money] = 500 if session[:total_money] == nil
+  if session[:total_money] <= 0
+    @no_money = true
+  end
   erb :bet
 end
 
@@ -111,7 +114,7 @@ get '/game' do
   session[:player_cards] << session[:deck].pop
 
   if calculate_total(session[:player_cards]) == 21
-    @success = 'Congratulation, Blackjack! you win.'
+    @success = "Congratulation, Blackjack! you win. #{ session[:player_name] } now has $#{ session[:total_money]}."
     @show_hit_or_stay_buttons = false
     @game_end = true
     @in_player_turn = false
