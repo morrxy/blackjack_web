@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'sinatra'
 require 'pry'
-require 'sinatra/reloader'
+# require 'sinatra/reloader'
 
 set :sessions, true
 

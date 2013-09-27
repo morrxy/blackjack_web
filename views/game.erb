@@ -55,8 +55,8 @@
   </div>
 
   <% if @in_player_turn %>
-  <form action="/game/player/hit" method='post' id='hit'>
-    <input id="hit_form" type='submit' class='btn btn-success btn-large' value='Hit'>
+  <form id="hit_form" action="/game/player/hit" method='post' id='hit'>
+    <input type='submit' class='btn btn-success btn-large' value='Hit'>
   </form>
   <form id="stay_form" action="/game/player/stay" method='post' id='stay'>
     <input type='submit' class='btn btn-warning btn-large' value='Stay'>
