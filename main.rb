@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'sinatra'
 require 'pry'
-# require 'sinatra/reloader'
+require 'sinatra/reloader'
 
 set :sessions, true
 
@@ -180,7 +180,7 @@ post '/game/player/hit' do
 
   player_busted?
 
-  erb :game
+  erb :game, layout: false
 end
 
 post '/game/player/stay' do
